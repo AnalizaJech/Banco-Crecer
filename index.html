@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <link rel="shortcut icon" href="Bank.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- awesone fonts css-->
+    <link href="css/font-awesome.css" rel="stylesheet" type="text/css">
+    <!-- owl carousel css-->
+    <link rel="stylesheet" href="owl-carousel/assets/owl.carousel.min.css" type="text/css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <title>BANCO CRECER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<style>
+    /* Add custom styles if needed */
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light bg-transparent" id="gtco-main-nav">
+    <div class="container"><a class="navbar-brand">Banco Crecer</a>
+        <button class="navbar-toggler" data-target="#my-nav" onclick="myFunction(this)" data-toggle="collapse"><span
+                class="bar1"></span> <span class="bar2"></span> <span class="bar3"></span></button>
+        <div id="my-nav" class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#consulta">Consulta</a></li>
+            </ul>
+            
+        </div>
+    </div>
+</nav>
+<div id="inicio" class="container-fluid gtco-banner-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h1> Prometemos ofrecer la mejor solución para tu negocio. </h1>
+                <p> "En nuestro banco, nos comprometemos a ofrecerte la solución financiera óptima para tu negocio. Buscamos potenciar tu éxito a través de opciones personalizadas y servicios eficientes. Contamos con la experiencia y dedicación necesarias para ser tu aliado financiero de confianza." </p>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<h1>ACA EL CODIGO</h1>-->
+
+
+<div id="consulta" class="container mt-5 pb-5 pt-5" style="background-color: rgb(217, 235, 250);border-radius: 20px;">
+
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+            <input type="search" class="form-control" id="search" placeholder="Realizar Busqueda">
+        </div>
+    </div>
+
+    <h3 id="error" class="text-center mt-3"></h3>
+
+    <div class="row">
+        <div class="offset-md-1 col-md-10">
+
+            <div class="table-responsive">
+                <table class="table table-bordered border-primary table-hover mt-5 text-capitalize" id="mytable">
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var array = [
+        {
+            NOMBRES: "ZENAIDA MOSCOSO HERRERA",
+            CONSUMO: "EMPRENDIENDO CONFIANZA CUOTAS",
+            VIGENTE: "JUDICIAL",
+            MONTO: "S/. 52,493.40 ",
+            PLAZO: "24 MESES",
+            FECHADESEMBOLSO: "29/04/2023",
+            MORA: "120 DIAS",
+            SALDOCAPITAL: "S/. 52,374.30",
+            SALDOVENCIDO: "S/. 52,374.30"
+        },
+        {
+        NOMBRES: "OLGA EGOAVIL BALTAZAR",
+        CONSUMO: "EMPRENDIENDO CONFIANZA CUOTAS",
+        VIGENTE: "REFINANCIADO",
+        MONTO: "S/. 46,095.40",
+        PLAZO: "57 MESES",
+        FECHADESEMBOLSO: "31/05/2022",
+        MORA: "7 DIAS",
+        SALDOCAPITAL: "S/. 38,026.26 ",
+        SALDOVENCIDO: "S/. 0"
+        },
+        {
+        NOMBRES: "HUMBHERTO MAMNI HUANCA",
+        CONSUMO: "CONSTRUYENDO CONFIANZA",
+        VIGENTE: "VIGENTE",
+        MONTO: "S/. 6,000",
+        PLAZO: "24 MESES",
+        FECHADESEMBOLSO: "02/11/2021",
+        MORA: "-7 DIAS",
+        SALDOCAPITAL: "S/. 1,404.57",
+        SALDOVENCIDO: "S/. 0"
+        },
+        {
+        NOMBRES: "YESSICA VERONIKA CARMONA FERNANDEZ",
+        CONSUMO: "CONSUMO CUOTAS",
+        VIGENTE: "VENCIDO",
+        MONTO: "S/. 3,042",
+        PLAZO: "12 MESES",
+        FECHADESEMBOLSO: "11/04/2022",
+        MORA: "101 DIAS",
+        SALDOCAPITAL: "S/. 329.25",
+        SALDOVENCIDO: "S/. 329.25"
+        }
+    ];
+
+    function showtable(curarray) {
+        document.getElementById("mytable").innerHTML = `
+            <tr class="bg-primary text-white fw-bold">
+                <td>NOMBRES</td>
+                <td>SITUACION FINANCIERA</td>
+                <td>PROCESO</td>
+                <td>MONTO</td>
+                <td>PLAZO</td>
+                <td>FECHA DE DESEMBOLSO</td>
+                <td>MORA</td>
+                <td>SALDO CAPITAL</td>
+                <td>SALDO VENCIDO</td>
+            </tr>`;
+
+        if (curarray == "") {
+            document.getElementById("error").innerHTML = `<span class='text-danger '>No se encuentra en los registros...</span>`;
+        } else {
+            document.getElementById("error").innerHTML = "";
+
+            for (var i = 0; i < curarray.length; i++) {
+                document.getElementById("mytable").innerHTML += ` 
+                    <tr> 
+                        <td>${curarray[i].NOMBRES}</td>
+                        <td>${curarray[i].CONSUMO}</td>
+                        <td>${curarray[i].VIGENTE}</td>
+                        <td>${curarray[i].MONTO}</td>
+                        <td>${curarray[i].PLAZO}</td>
+                        <td>${curarray[i].FECHADESEMBOLSO}</td>
+                        <td>${curarray[i].MORA}</td>
+                        <td>${curarray[i].SALDOCAPITAL}</td>
+                        <td>${curarray[i].SALDOVENCIDO}</td>
+                    </tr>`;
+            }
+        }
+    }
+
+    showtable(array);
+
+    var newarray = [];
+
+    document.getElementById("search").addEventListener("keyup", function () {
+        var search = this.value.toLowerCase();
+
+        newarray = array.filter(function (val) {
+            if (
+                val.NOMBRES.toLowerCase().includes(search) ||
+                val.CONSUMO.toLowerCase().includes(search) ||
+                val.VIGENTE.toLowerCase().includes(search) ||
+                val.MONTO.toLowerCase().includes(search) ||
+                val.PLAZO.toLowerCase().includes(search) ||
+                val.FECHADESEMBOLSO.toLowerCase().includes(search) ||
+                val.MORA.toLowerCase().includes(search) ||
+                val.SALDOCAPITAL.toLowerCase().includes(search) ||
+                val.SALDOVENCIDO.toLowerCase().includes(search)
+            ) {
+                return val;
+            }
+        });
+
+        showtable(newarray);
+    });
+
+</script>
+<!--<h1>CARAJOS</h1>-->
+
+
+
+<footer style="margin-top: 100px;" class="bg-dark text-light py-2">
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+      © 2024 Copyright: LISSET YATACO TASAYCO
+      <br>
+      <a class="text-white" href="https://www.youtube.com/@analizajech">Analiza Jech</a>
+    </div>
+</footer>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="js/jquery-3.3.1.slim.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!-- owl carousel js-->
+<script src="owl-carousel/owl.carousel.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
