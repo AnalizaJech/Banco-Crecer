@@ -1817,3 +1817,19 @@ th {
 }
 
 th { position: relative; }
+
+@media(max-width:360px){
+  .overview{grid-template-columns:minmax(0,1fr)}
+  .metric{min-height:165px}
+  .metric h2{font-size:26px}
+  .portfolio-content{gap:14px}
+  .donut{width:96px;height:96px}
+  .donut>div{width:74px;height:74px}
+  .donut strong{font-size:21px}
+  .legend{min-width:0}
+  .legend button{gap:5px;font-size:9px}
+  .legend button small{width:30px;font-size:8px}
+  .growth-panel h2{font-size:23px}
+  .growth-art{opacity:.35}
+  .subtle-pill{font-size:8px;padding:5px}
+}
