@@ -29,7 +29,7 @@ npm run preview
 
 ## Publicación
 
-La compilación usa la base `/Banco-Crecer/`, siguiendo la [configuración de Vite para GitHub Pages](https://vite.dev/guide/static-deploy.html). La rama `gh-pages` contiene el resultado compilado. En GitHub, seleccionar **Settings → Pages → Deploy from a branch → gh-pages → / (root)**. El flujo de GitHub Actions valida y actualiza esa rama cuando se modifica `master`.
+La compilación usa la base `/Banco-Crecer/`, siguiendo la [configuración de Vite para GitHub Pages](https://vite.dev/guide/static-deploy.html). En GitHub, seleccionar **Settings → Pages → Source → GitHub Actions**. El flujo valida, compila y publica automáticamente el contenido de `dist` cuando se modifica `master`.
 
 ## Alcance
 
