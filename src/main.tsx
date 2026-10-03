@@ -20,7 +20,11 @@ import {
   BriefcaseBusiness,
   ArrowLeft,
 } from "lucide-react";
-import { client, money, date } from "./data";
+import { client as referenceClient, money, date } from "./data";
+import { Admin } from "./Admin";
+import { ExtraSections } from "./ExtraSections";
+import { usePortfolio, downloadCSV } from "./portfolio";
+import { FileText } from "lucide-react";
 import "./styles.css";
 
 const movements = ["09", "08", "07", "06", "05", "04"].map((month, i) => ({
@@ -37,7 +41,7 @@ const products = [
     icon: Wallet,
     description: "Un lugar para tus ahorros. Un comienzo para tus planes.",
     detail:
-      "La Cuenta Crecer representa nuestra propuesta de ahorro personal. En este sitio de demostración puedes conocer el producto; la apertura de cuentas y las condiciones comerciales no están habilitadas.",
+      "Organiza el dinero que reservas para tus próximos proyectos. Una cuenta de ahorro permite separar tus objetivos de los gastos del día a día. Revisa las condiciones, cargos y requisitos antes de abrir una cuenta.",
     action: "Conocer la cuenta",
   },
   {
@@ -46,7 +50,7 @@ const products = [
     icon: CreditCard,
     description: "Ese siguiente paso que quieres dar, más cerca de ti.",
     detail:
-      "Explora cómo el monto y el plazo afectan una cuota mensual con nuestro simulador ilustrativo. La tasa utilizada es ficticia y no constituye una oferta de crédito.",
+      "Financiación para proyectos personales con un monto y plazo definidos. Utiliza el simulador para comparar cuotas según el monto y el tiempo. Revisa el costo total y los cargos del producto antes de asumir un compromiso.",
     action: "Explorar el crédito",
   },
   {
@@ -55,26 +59,55 @@ const products = [
     icon: BriefcaseBusiness,
     description: "Impulsa lo que construyes con esfuerzo, todos los días.",
     detail:
-      "Emprendiendo confianza es el producto de ejemplo que puedes consultar en nuestra banca personal. Su ficha muestra monto, plazo, saldo y pagos registrados. El sitio no recibe solicitudes de financiación.",
+      "Emprendiendo confianza está orientado a capital de trabajo, equipamiento o mejoras de un negocio. La ficha reúne monto original, plazo, desembolso, mora y saldos para facilitar el seguimiento.",
     action: "Conocer más",
+  },
+  {
+    name: "Crédito vivienda",
+    tag: "PARA TU HOGAR",
+    icon: Wallet,
+    description: "Un espacio para vivir. Un proyecto para construir.",
+    detail:
+      "Construyendo confianza reúne la información de créditos orientados al hogar. Su evaluación contempla el proyecto, el plazo y la capacidad de pago. En la ficha puedes consultar desembolso, capital pendiente y estado del crédito.",
+    action: "Conocer el producto",
+  },
+  {
+    name: "Ahorro con objetivo",
+    tag: "PARA LO QUE VIENE",
+    icon: Wallet,
+    description:
+      "Ponle nombre a tus planes y organiza el camino para alcanzarlos.",
+    detail:
+      "Define una meta, el monto que quieres reunir y una fecha. Separar el ahorro destinado a cada objetivo ayuda a organizar tus recursos. Consulta las condiciones de una cuenta y su disponibilidad antes de elegir un producto.",
+    action: "Explorar el ahorro",
+  },
+  {
+    name: "Depósito a plazo",
+    tag: "PARA PLANIFICAR",
+    icon: BriefcaseBusiness,
+    description:
+      "Conoce una forma de reservar tu dinero durante un plazo definido.",
+    detail:
+      "Un depósito a plazo mantiene un capital durante un periodo acordado. Sus condiciones definen tasa, vencimiento y tratamiento de un retiro anticipado. Esta ficha explica el concepto; no muestra tasas comerciales ni recibe depósitos.",
+    action: "Ver cómo funciona",
   },
 ];
 const faqs = [
   [
     "¿Cómo puedo entrar a la banca por internet?",
-    "Selecciona Banca por internet y luego Explorar banca personal. Accederás al perfil ficticio de Mariana Torres. No necesitas ingresar documentos, contraseñas ni información personal.",
+    "Selecciona Banca por internet y luego Entrar a mi banca. Encontrarás tus productos, movimientos, documentos y ayuda en la navegación superior.",
   ],
   [
-    "¿Puedo abrir una cuenta o solicitar un crédito?",
-    "Este proyecto es una experiencia de demostración. Puedes conocer los productos y simular una cuota, pero no abrir cuentas, solicitar créditos ni realizar transacciones.",
+    "¿Dónde está el área administrativa?",
+    "El enlace Área de gestión está en la barra superior, en la pantalla de acceso y en el pie del sitio. Allí puedes consultar la cartera, buscar clientes, registrar o editar créditos y descargar reportes.",
   ],
   [
     "¿Qué información puedo consultar en mi banca?",
-    "La banca personal de ejemplo permite revisar un crédito, su saldo de capital y el historial de pagos, además de descargar un estado de crédito con datos ficticios.",
+    "Puedes revisar el saldo y las condiciones de tu crédito, ver los pagos registrados, filtrar por periodo y descargar los documentos disponibles.",
   ],
   [
-    "¿La cuota del simulador es una oferta bancaria?",
-    "No. El cálculo usa una tasa efectiva anual ficticia del 18 %, sin seguros ni comisiones. Es un ejercicio ilustrativo, no una cotización ni una oferta de financiación.",
+    "¿Cómo descargo mi estado de crédito?",
+    "Entra a tu banca y abre Documentos. También puedes descargar desde Mi crédito o desde Movimientos después de seleccionar un periodo. El archivo CSV se puede abrir con Excel u otra hoja de cálculo.",
   ],
 ];
 function Logo({ light = false }: { light?: boolean }) {
@@ -108,10 +141,15 @@ function Logo({ light = false }: { light?: boolean }) {
   );
 }
 function App() {
+  const portfolio = usePortfolio();
+  const client =
+    portfolio.find((c) => c.id === referenceClient.id) || referenceClient;
   const [route, setRoute] = useState(
     location.hash === "#banca" || location.hash === "#acceso"
       ? "acceso"
-      : "inicio",
+      : location.hash === "#gestion"
+        ? "gestion"
+        : "inicio",
   );
   const [mobileMenu, setMobileMenu] = useState(false),
     [modal, setModal] = useState<{ title: string; body: string } | null>(null),
@@ -132,7 +170,9 @@ function App() {
           ? "banca"
           : hash === "#acceso" || hash === "#banca"
             ? "acceso"
-            : "inicio",
+            : hash === "#gestion"
+              ? "gestion"
+              : "inicio",
       );
       setMobileMenu(false);
     };
@@ -153,8 +193,7 @@ function App() {
     setToast("");
     setRoute(next);
     setMobileMenu(false);
-    location.hash =
-      next === "inicio" ? "inicio" : next === "banca" ? "banca" : "acceso";
+    location.hash = next;
     window.scrollTo({ top: 0 });
   };
   const enter = () => {
@@ -175,12 +214,21 @@ function App() {
         ? "Mi banca | Banco Crecer"
         : route === "acceso"
           ? "Banca por internet | Banco Crecer"
-          : "Banco Crecer | Un buen comienzo";
+          : route === "gestion"
+            ? "Área de gestión | Banco Crecer"
+            : "Banco Crecer | Un buen comienzo";
     if (
       route === "inicio" &&
-      ["#productos", "#simulador", "#nosotros", "#negocios", "#ayuda"].includes(
-        location.hash,
-      )
+      [
+        "#productos",
+        "#simulador",
+        "#nosotros",
+        "#negocios",
+        "#ayuda",
+        "#seguridad",
+        "#educacion",
+        "#canales",
+      ].includes(location.hash)
     )
       document.querySelector(location.hash)?.scrollIntoView();
   }, [route]);
@@ -202,36 +250,24 @@ function App() {
       ["Plazo meses", client.months],
       [],
       ["Operación", "Fecha", "Concepto", "Pago PEN"],
-      ...filteredMovements.map((m) => [m.id, m.date, m.title, m.amount]),
+      ...(bankTab === "Movimientos" ? filteredMovements : movements).map(
+        (m) => [m.id, m.date, m.title, m.amount],
+      ),
     ];
-    const csv =
-      "\uFEFF" +
-      rows
-        .map((r) =>
-          r.map((v) => '"' + String(v).replaceAll('"', '""') + '"').join(","),
-        )
-        .join("\r\n");
-    const url = URL.createObjectURL(
-      new Blob([csv], { type: "text/csv;charset=utf-8" }),
-    );
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "crecer-estado-de-credito-demo.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV("crecer-estado-de-credito.csv", rows);
     setToast("Tu estado de crédito se descargó correctamente.");
   };
   const helpModal = () =>
     setModal({
       title: "Estamos para orientarte",
-      body: "Puedes encontrar respuestas en la sección de preguntas frecuentes del sitio. Esta experiencia de demostración no cuenta con asesores ni canales de atención bancaria operativos. No compartas documentos, claves ni datos personales.",
+      body: "Para revisar pagos, abre Movimientos; para descargar información, entra a Documentos. El Área de gestión reúne la cartera y los clientes. Encuentra explicaciones sobre los saldos en la guía financiera del sitio.",
     });
   return (
     <>
       <a className="skip" href="#contenido">
         Saltar al contenido
       </a>
-      {route !== "banca" && (
+      {route !== "banca" && route !== "gestion" && (
         <div className="utility">
           <div className="container utility-inner">
             <div>
@@ -250,6 +286,9 @@ function App() {
                 }}
               >
                 Negocios
+              </a>
+              <a href="#gestion" onClick={() => navigate("gestion")}>
+                Área de gestión
               </a>
             </div>
             <button onClick={helpModal}>
@@ -307,7 +346,13 @@ function App() {
           ) : route === "banca" ? (
             <>
               <nav className="bank-nav" aria-label="Banca personal">
-                {["Mis productos", "Movimientos", "Mi crédito"].map((t) => (
+                {[
+                  "Mis productos",
+                  "Movimientos",
+                  "Mi crédito",
+                  "Documentos",
+                  "Ayuda",
+                ].map((t) => (
                   <button
                     key={t}
                     aria-current={bankTab === t ? "page" : undefined}
@@ -322,6 +367,13 @@ function App() {
                 Salir <ArrowUpRight size={15} />
               </button>
             </>
+          ) : route === "gestion" ? (
+            <div className="management-header-links">
+              <span>Gestión de cartera</span>
+              <button className="back-link" onClick={() => navigate("inicio")}>
+                <ArrowLeft size={15} /> Volver al sitio
+              </button>
+            </div>
           ) : (
             <button className="back-link" onClick={() => navigate("inicio")}>
               <ArrowLeft size={15} /> Volver al inicio
@@ -329,7 +381,9 @@ function App() {
           )}
         </div>
       </header>
-      {route === "inicio" ? (
+      {route === "gestion" ? (
+        <Admin />
+      ) : route === "inicio" ? (
         <main id="contenido">
           <section className="hero">
             <div className="container hero-layout">
@@ -473,9 +527,9 @@ function App() {
                 <div className="calculation-note">
                   <ShieldCheck size={21} />
                   <p>
-                    Simulación ilustrativa.
+                    Elige el monto y el plazo.
                     <br />
-                    <strong>Sin solicitudes ni datos personales.</strong>
+                    <strong>Compara la cuota mensual.</strong>
                   </p>
                 </div>
               </div>
@@ -484,8 +538,8 @@ function App() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   setModal({
-                    title: "Tu simulación de crédito",
-                    body: `Para un monto de ${money(amount)} a ${months} meses, la cuota ilustrativa es ${money(installment)} al mes. Total estimado: ${money(installment * months)}. Tasa efectiva anual ficticia: 18 %. No incluye seguros ni comisiones. Esta simulación no es una oferta de financiación.`,
+                    title: "Detalle del cálculo",
+                    body: `Para un monto de ${money(amount)} a ${months} meses, la cuota estimada es ${money(installment)} al mes. Total estimado: ${money(installment * months)}. TEA de referencia: 18 %. No incluye seguros ni comisiones.`,
                   });
                 }}
               >
@@ -549,11 +603,11 @@ function App() {
                   </output>
                 </div>
                 <button className="button primary" type="submit">
-                  Ver mi simulación <ArrowRight size={17} />
+                  Ver detalle del cálculo <ArrowRight size={17} />
                 </button>
                 <p className="calculator-disclaimer">
-                  TEA ficticia de 18 %. No incluye seguros ni comisiones.
-                  Cálculo referencial, sin carácter de oferta comercial.
+                  TEA de referencia: 18 %. No incluye seguros ni comisiones. No
+                  constituye una oferta comercial.
                 </p>
               </form>
             </div>
@@ -624,6 +678,10 @@ function App() {
               Conocer el producto <ArrowUpRight size={17} />
             </button>
           </section>
+          <ExtraSections
+            openBank={() => navigate("acceso")}
+            showInfo={(title, body) => setModal({ title, body })}
+          />
           <section id="ayuda" className="section container faq-section">
             <div>
               <p className="eyebrow">ESTAMOS CERCA</p>
@@ -635,7 +693,7 @@ function App() {
               <p>
                 Información clara para explorar
                 <br />
-                esta experiencia bancaria.
+                tus productos y canales.
               </p>
             </div>
             <div className="faq-list">
@@ -681,28 +739,36 @@ function App() {
               <LockKeyhole size={27} strokeWidth={1.4} />
             </span>
             <h2>Bienvenido a tu banca</h2>
-            <p>Explora la experiencia con un perfil de ejemplo.</p>
+            <p>Consulta tus productos y organiza tus documentos.</p>
             <div className="demo-user">
               <span>MT</span>
               <div>
-                <strong>Mariana Torres</strong>
-                <small>Cliente de demostración</small>
+                <strong>{client.name}</strong>
+                <small>Banca personal</small>
               </div>
-              <span className="small-tag">DEMO</span>
+              <span className="small-tag">PEN</span>
             </div>
             <button className="button primary" onClick={enter}>
-              Explorar banca personal <ArrowRight size={17} />
+              Entrar a mi banca <ArrowRight size={17} />
             </button>
             <div className="access-disclaimer">
               <ShieldCheck size={18} />
               <p>
-                Acceso de demostración. No ingreses documentos, claves ni
-                información personal. No se realizan operaciones reales.
+                Elige tu producto para consultar sus condiciones, revisar los
+                pagos y descargar información.
               </p>
             </div>
             <button className="access-help" onClick={helpModal}>
               ¿Necesitas ayuda? <ArrowUpRight size={14} />
             </button>
+            <a
+              className="access-management"
+              href="#gestion"
+              onClick={() => navigate("gestion")}
+            >
+              ¿Gestionas la cartera? Entrar al área de gestión{" "}
+              <ArrowUpRight size={14} />
+            </a>
           </section>
         </main>
       ) : (
@@ -710,11 +776,11 @@ function App() {
           <div className="bank-heading">
             <div>
               <p className="eyebrow">MI BANCA PERSONAL</p>
-              <h1>Hola, Mariana.</h1>
+              <h1>Hola, {client.name.split(" ")[0]}.</h1>
               <p>Es bueno tener tus planes a la vista.</p>
             </div>
             <span className="demo-badge">
-              <span /> Perfil de demostración
+              <span /> Banca personal
             </span>
           </div>
           {bankTab === "Mis productos" ? (
@@ -733,7 +799,7 @@ function App() {
                       {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <h2>Emprendiendo confianza</h2>
+                  <h2>{client.product}</h2>
                   <span className="credit-id">{client.id}</span>
                   <p className="balance-label">Saldo de capital pendiente</p>
                   <strong className="personal-balance">
@@ -741,7 +807,10 @@ function App() {
                   </strong>
                   <div className="credit-summary-bottom">
                     <span className="good-status">
-                      <Check size={13} /> Al día
+                      <Check size={13} />{" "}
+                      {client.status === "Vigente" && client.overdue === 0
+                        ? "Al día"
+                        : client.status}
                     </span>
                     <button onClick={() => setBankTab("Mi crédito")}>
                       Ver mi crédito <ArrowRight size={15} />
@@ -801,7 +870,7 @@ function App() {
               <div className="bank-section-title">
                 <div>
                   <h2>Historial de pagos</h2>
-                  <p>Pagos aplicados a tu crédito de ejemplo.</p>
+                  <p>Pagos aplicados a tu crédito.</p>
                 </div>
                 <button className="button outline" onClick={exportStatement}>
                   <Download size={16} /> Descargar estado
@@ -846,15 +915,84 @@ function App() {
                 {filteredMovements.length} pagos registrados
               </p>
             </section>
+          ) : bankTab === "Documentos" ? (
+            <section className="bank-section documents-section">
+              <div className="bank-section-title">
+                <div>
+                  <h2>Mis documentos</h2>
+                  <p>Información de tu crédito lista para descargar.</p>
+                </div>
+              </div>
+              <div className="document-list">
+                <article>
+                  <FileText size={25} />
+                  <div>
+                    <h3>Estado de crédito</h3>
+                    <p>Saldo, monto original, plazo y pagos registrados.</p>
+                  </div>
+                  <button className="button outline" onClick={exportStatement}>
+                    <Download size={16} /> Descargar CSV
+                  </button>
+                </article>
+                <article>
+                  <FileText size={25} />
+                  <div>
+                    <h3>Historial por periodo</h3>
+                    <p>Selecciona un mes antes de descargar tus movimientos.</p>
+                  </div>
+                  <button
+                    className="button outline"
+                    onClick={() => setBankTab("Movimientos")}
+                  >
+                    Elegir periodo <ArrowRight size={16} />
+                  </button>
+                </article>
+              </div>
+            </section>
+          ) : bankTab === "Ayuda" ? (
+            <section className="bank-section personal-assistance">
+              <div className="bank-section-title">
+                <h2>¿Qué necesitas consultar?</h2>
+              </div>
+              <div className="assistance-options">
+                <button onClick={() => setBankTab("Mi crédito")}>
+                  <CreditCard size={23} />
+                  <h3>Entender mi crédito</h3>
+                  <p>
+                    Consulta condiciones, saldo pendiente y capital amortizado.
+                  </p>
+                  <ArrowRight size={17} />
+                </button>
+                <button onClick={() => setBankTab("Movimientos")}>
+                  <Wallet size={23} />
+                  <h3>Revisar mis pagos</h3>
+                  <p>Busca los pagos registrados en un periodo.</p>
+                  <ArrowRight size={17} />
+                </button>
+                <button onClick={() => setBankTab("Documentos")}>
+                  <Download size={23} />
+                  <h3>Descargar información</h3>
+                  <p>Conserva el estado de tu crédito.</p>
+                  <ArrowRight size={17} />
+                </button>
+              </div>
+              <p className="bank-note">
+                Consulta el significado de los saldos en nuestra guía
+                financiera.
+              </p>
+              <a className="text-link" href="#educacion">
+                Ir a la guía financiera <ArrowUpRight size={15} />
+              </a>
+            </section>
           ) : (
             <section className="bank-section credit-detail">
               <div className="bank-section-title">
                 <div>
                   <p className="eyebrow">{client.id}</p>
-                  <h2>Emprendiendo confianza</h2>
+                  <h2>{client.product}</h2>
                 </div>
                 <span className="good-status">
-                  <Check size={13} /> Crédito vigente
+                  <Check size={13} /> {client.status}
                 </span>
               </div>
               <div className="credit-progress">
@@ -897,17 +1035,14 @@ function App() {
                 <Download size={16} /> Descargar estado de crédito
               </button>
               <p className="bank-note">
-                Los datos y pagos de esta cuenta son ficticios. No se habilitan
-                pagos ni transferencias.
+                El saldo de capital representa el monto pendiente de
+                amortización.
               </p>
             </section>
           )}
           <div className="personal-help">
             <ShieldCheck size={20} />
             <p>Cuida tu información. Nunca compartas tus claves.</p>
-            <button onClick={helpModal}>
-              Ayuda <ArrowUpRight size={15} />
-            </button>
           </div>
         </main>
       )}
@@ -930,16 +1065,22 @@ function App() {
                 <a href="#nosotros">Nuestra visión</a>
                 <a href="#productos">Nuestros productos</a>
                 <a href="#negocios">Para tu negocio</a>
+                <a href="#gestion" onClick={() => navigate("gestion")}>
+                  Área de gestión
+                </a>
               </div>
               <div>
                 <h3>Estamos cerca</h3>
                 <a href="#ayuda">Preguntas frecuentes</a>
+                <a href="#seguridad">Seguridad digital</a>
+                <a href="#educacion">Educación financiera</a>
+                <a href="#canales">Canales digitales</a>
                 <button onClick={helpModal}>Atención y ayuda</button>
                 <button
                   onClick={() =>
                     setModal({
                       title: "Privacidad y alcance",
-                      body: "Este proyecto usa datos ficticios y no solicita credenciales ni almacena información personal. No utiliza analítica ni cookies propias. Las tipografías se cargan desde Google Fonts. No es una entidad bancaria operativa ni ofrece servicios financieros reales.",
+                      body: "Este proyecto utiliza datos de referencia y no solicita credenciales bancarias. Los créditos que crees o edites se almacenan únicamente en este navegador y no se envían a un servidor. No utiliza analítica ni cookies propias. Las tipografías se cargan desde Google Fonts. No es una entidad bancaria operativa.",
                     })
                   }
                 >
@@ -965,7 +1106,8 @@ function App() {
               Jech
             </span>
             <span>
-              Experiencia de demostración · Sin operaciones bancarias reales
+              Proyecto de muestra con datos ficticios. Sin operaciones bancarias
+              reales.
             </span>
           </div>
         </div>

@@ -20,17 +20,23 @@ npm run preview
 
 ## Experiencia
 
-- Inicio institucional: productos, propuesta del banco, negocios y preguntas frecuentes.
+- Inicio institucional: seis productos, propuesta del banco, negocios y preguntas frecuentes.
+- Apartados de canales digitales, seguridad y educación financiera.
 - Simulador interactivo con monto, plazo, cuota y detalle del cálculo. TEA ficticia de 18 %, sin seguros ni comisiones.
 - Acceso separado a una banca personal de demostración, sin solicitar credenciales.
 - Perfil ficticio de Mariana Torres: crédito, saldo, pagos registrados y capital amortizado.
 - Filtro por periodo y descarga CSV del estado de crédito.
+- Banca personal con documentos y ayuda, además de productos, movimientos y detalle del crédito.
+- Área de gestión con resumen, cartera, clientes y reportes. Búsqueda sin acentos, filtro por estado, ordenación y detalle completo.
+- Alta y edición de créditos con persistencia en el navegador y validación de montos. Los cambios del crédito de Mariana se reflejan en su banca personal.
 - Navegación superior única, menú móvil, diálogos nativos y soporte para teclado.
 - Logo vectorial propio, favicon y sistema visual documentado en `DESIGN_SYSTEM.md`.
 
 ## Rutas
 
-`#inicio`: sitio público. `#acceso`: acceso de demostración. `#banca`: banca personal después de entrar. Los enlaces de secciones funcionan con anclas. La sesión ficticia vive en memoria y se reinicia al recargar; no representa autenticación real.
+`#inicio`: sitio público. `#acceso`: acceso a la banca personal. `#banca`: banca personal después de entrar. `#gestion`: área administrativa. El enlace a gestión está en la barra superior, el acceso y el pie del sitio. Los enlaces de secciones funcionan con anclas. La sesión vive en memoria y se reinicia al recargar; no representa autenticación real.
+
+Los registros de cartera se guardan en `localStorage` con la clave `crecer-portfolio-v1`. No se sincronizan con un servidor. La exportación CSV permite conservar una copia. No almacenar información personal real en esta aplicación; gestión es un área de muestra sin control de acceso.
 
 ## Publicación
 
