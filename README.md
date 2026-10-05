@@ -29,7 +29,7 @@ npm run preview
 - Banca personal con documentos y ayuda, además de productos, movimientos y detalle del crédito.
 - Área de gestión con resumen, cartera, clientes y reportes. Búsqueda sin acentos, filtro por estado, ordenación y detalle completo.
 - Alta y edición de créditos con persistencia en el navegador y validación de montos. Los cambios del crédito de Mariana se reflejan en su banca personal.
-- Navegación superior única, menú móvil, diálogos nativos y soporte para teclado.
+- Navegación superior única y menú móvil. Selectores, ventanas, acordeones y deslizador con componentes React de Radix UI; calendario personalizado con React DayPicker. Soporte para teclado y foco visible.
 - Logo vectorial propio, favicon y sistema visual documentado en `DESIGN_SYSTEM.md`.
 
 ## Rutas

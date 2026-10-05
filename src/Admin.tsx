@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   ChevronRight,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { date, money, normalize, type Credit } from "./data";
 import { downloadCSV, savePortfolio, usePortfolio } from "./portfolio";
+import { BankSelect, BankModal, BankDatePicker } from "./ui";
 const states = ["Vigente", "Refinanciado", "Vencido", "Judicial"];
 const productNames = [
   "Emprendiendo confianza",
@@ -48,11 +49,6 @@ export function Admin() {
     [draft, setDraft] = useState<Credit | null>(null),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    if (selected || draft) dialog.current?.showModal();
-    else dialog.current?.close();
-  }, [selected, draft]);
   useEffect(() => {
     if (message) {
       const t = setTimeout(() => setMessage(""), 4000);
@@ -370,26 +366,27 @@ export function Admin() {
             </label>
             <label>
               Estado
-              <select
-                aria-label="Estado del crédito"
+              <BankSelect
+                label="Estado del crédito"
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                {["Todos", ...states].map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
+                onValueChange={setStatus}
+                options={["Todos", ...states].map((value) => ({
+                  value,
+                  label: value,
+                }))}
+              />
             </label>
             <label>
               Orden
-              <select
-                aria-label="Ordenar cartera"
+              <BankSelect
+                label="Ordenar cartera"
                 value={sort}
-                onChange={(e) => setSort(e.target.value)}
-              >
-                <option value="name">Nombre</option>
-                <option value="balance">Mayor saldo</option>
-              </select>
+                onValueChange={setSort}
+                options={[
+                  { value: "name", label: "Nombre" },
+                  { value: "balance", label: "Mayor saldo" },
+                ]}
+              />
             </label>
           </div>
           <div
@@ -522,14 +519,11 @@ export function Admin() {
         Los registros que crees o edites se guardan en este navegador. Las
         descargas incluyen los filtros aplicados.
       </p>
-      <dialog
-        ref={dialog}
+      <BankModal
         className="management-dialog"
-        aria-label={draft ? "Formulario de crédito" : "Detalle del crédito"}
-        onCancel={close}
-        onClick={(e) => {
-          if (e.target === dialog.current) close();
-        }}
+        open={Boolean(selected || draft)}
+        onClose={close}
+        title={draft ? "Formulario de crédito" : "Detalle del crédito"}
       >
         <div className="management-dialog-top">
           <p className="eyebrow">
@@ -549,8 +543,15 @@ export function Admin() {
         </div>
         {draft ? (
           <form
+            noValidate
             onSubmit={(e) => {
               e.preventDefault();
+              const invalid = Array.from(e.currentTarget.querySelectorAll("input")).find((input) => !input.validity.valid);
+              if (invalid) {
+                setError("Revisa los campos: completa el nombre y utiliza montos y plazos dentro de los límites indicados.");
+                invalid.focus();
+                return;
+              }
               save();
             }}
           >
@@ -568,25 +569,24 @@ export function Admin() {
               </label>
               <label>
                 Producto
-                <select
+                <BankSelect
+                  label="Producto"
                   value={draft.product}
-                  onChange={(e) => field("product", e.target.value)}
-                >
-                  {productNames.map((p) => (
-                    <option key={p}>{p}</option>
-                  ))}
-                </select>
+                  onValueChange={(value) => field("product", value)}
+                  options={productNames.map((value) => ({
+                    value,
+                    label: value,
+                  }))}
+                />
               </label>
               <label>
                 Estado
-                <select
+                <BankSelect
+                  label="Estado"
                   value={draft.status}
-                  onChange={(e) => field("status", e.target.value)}
-                >
-                  {states.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
+                  onValueChange={(value) => field("status", value)}
+                  options={states.map((value) => ({ value, label: value }))}
+                />
               </label>
               {[
                 { key: "amount", name: "Monto desembolsado (PEN)", min: 1 },
@@ -618,11 +618,10 @@ export function Admin() {
               ))}
               <label>
                 Desembolso
-                <input
-                  required
-                  type="date"
+                <BankDatePicker
+                  label="Desembolso"
                   value={draft.date}
-                  onChange={(e) => field("date", e.target.value)}
+                  onValueChange={(value) => field("date", value)}
                 />
               </label>
             </div>
@@ -687,7 +686,7 @@ export function Admin() {
             </>
           )
         )}
-      </dialog>
+      </BankModal>
       {message && (
         <div className="toast" role="status">
           <Check size={17} />

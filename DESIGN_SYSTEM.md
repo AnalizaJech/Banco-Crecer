@@ -29,4 +29,4 @@ Contenedor máximo de 1240 px. Una navegación superior, sin sidebar. El inicio 
 
 ## Interacción
 
-Enfoque visible en teclado, etiquetas de campos, diálogos nativos, FAQs con `details`, estados explícitos y movimiento reducido. No mostrar acciones de pagos o transferencias que no estén implementadas. Las condiciones de demostración se declaran en acceso, simulador y pie del sitio.
+Enfoque visible en teclado, etiquetas de campos, ventanas y acordeones con Radix UI, estados explícitos y movimiento reducido. Los desplegables, el deslizador y el calendario usan componentes React con estilos de la marca. Los errores de formularios aparecen dentro de la interfaz. No mostrar acciones de pagos o transferencias que no estén implementadas. Las condiciones de demostración se declaran en acceso, simulador y pie del sitio.

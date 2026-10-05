@@ -26,6 +26,13 @@ import { ExtraSections } from "./ExtraSections";
 import { usePortfolio, downloadCSV } from "./portfolio";
 import { FileText } from "lucide-react";
 import "./styles.css";
+import {
+  BankSelect,
+  BankModal,
+  BankAccordion,
+  BankSlider,
+  BankProgress,
+} from "./ui";
 
 const movements = ["09", "08", "07", "06", "05", "04"].map((month, i) => ({
   id: `OP-${1001 + i}`,
@@ -159,8 +166,7 @@ function App() {
     [months, setMonths] = useState(24),
     [toast, setToast] = useState(""),
     [period, setPeriod] = useState("Todos");
-  const dialog = useRef<HTMLDialogElement>(null),
-    demoSession = useRef(false);
+  const demoSession = useRef(false);
   useEffect(() => {
     const onHash = () => {
       const hash = location.hash;
@@ -179,10 +185,6 @@ function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  useEffect(() => {
-    if (modal) dialog.current?.showModal();
-    else dialog.current?.close();
-  }, [modal]);
   useEffect(() => {
     if (toast) {
       const t = setTimeout(() => setToast(""), 4500);
@@ -563,15 +565,13 @@ function App() {
                     onChange={(e) => setAmount(Number(e.target.value))}
                   />
                 </div>
-                <input
-                  aria-label="Ajustar monto"
-                  className="amount-range"
-                  type="range"
-                  min="1000"
-                  max="80000"
-                  step="500"
+                <BankSlider
+                  label="Ajustar monto"
+                  min={1000}
+                  max={80000}
+                  step={500}
                   value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  onValueChange={setAmount}
                 />
                 <div className="range-labels">
                   <span>S/ 1.000</span>
@@ -581,18 +581,15 @@ function App() {
                   ¿En cuánto tiempo?
                 </label>
                 <div className="select-wrap">
-                  <select
+                  <BankSelect
                     id="months"
-                    value={months}
-                    onChange={(e) => setMonths(Number(e.target.value))}
-                  >
-                    {[12, 18, 24, 36, 48].map((m) => (
-                      <option value={m} key={m}>
-                        {m} meses
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} />
+                    value={String(months)}
+                    onValueChange={(value) => setMonths(Number(value))}
+                    options={[12, 18, 24, 36, 48].map((value) => ({
+                      value: String(value),
+                      label: value + " meses",
+                    }))}
+                  />
                 </div>
                 <div className="installment">
                   <span>Cuota mensual estimada</span>
@@ -696,17 +693,7 @@ function App() {
                 tus productos y canales.
               </p>
             </div>
-            <div className="faq-list">
-              {faqs.map(([q, a]) => (
-                <details key={q}>
-                  <summary>
-                    {q}
-                    <ChevronDown size={17} />
-                  </summary>
-                  <p>{a}</p>
-                </details>
-              ))}
-            </div>
+            <BankAccordion items={faqs} />
           </section>
         </main>
       ) : route === "acceso" ? (
@@ -878,19 +865,22 @@ function App() {
               </div>
               <div className="movement-filter">
                 <label htmlFor="period">Periodo</label>
-                <select
+                <BankSelect
                   id="period"
                   value={period}
-                  onChange={(e) => setPeriod(e.target.value)}
-                >
-                  <option>Todos</option>
-                  <option value="2026-09">Septiembre 2026</option>
-                  <option value="2026-08">Agosto 2026</option>
-                  <option value="2026-07">Julio 2026</option>
-                  <option value="2026-06">Junio 2026</option>
-                  <option value="2026-05">Mayo 2026</option>
-                  <option value="2026-04">Abril 2026</option>
-                </select>
+                  onValueChange={setPeriod}
+                  options={[
+                    { value: "Todos", label: "Todos" },
+                    ...[
+                      ["2026-09", "Septiembre 2026"],
+                      ["2026-08", "Agosto 2026"],
+                      ["2026-07", "Julio 2026"],
+                      ["2026-06", "Junio 2026"],
+                      ["2026-05", "Mayo 2026"],
+                      ["2026-04", "Abril 2026"],
+                    ].map(([value, label]) => ({ value, label })),
+                  ]}
+                />
               </div>
               <div className="movement-list">
                 {filteredMovements.map((m) => (
@@ -1003,10 +993,10 @@ function App() {
                     {money(client.amount)}
                   </strong>
                 </div>
-                <progress
+                <BankProgress
                   value={client.amount - client.balance}
                   max={client.amount}
-                  aria-label="Capital amortizado"
+                  label="Capital amortizado"
                 />
                 <small>
                   {(
@@ -1112,13 +1102,10 @@ function App() {
           </div>
         </div>
       </footer>
-      <dialog
-        ref={dialog}
-        aria-label={modal?.title || "Información"}
-        onCancel={() => setModal(null)}
-        onClick={(e) => {
-          if (e.target === dialog.current) setModal(null);
-        }}
+      <BankModal
+        open={Boolean(modal)}
+        onClose={() => setModal(null)}
+        title={modal?.title || "Información"}
       >
         <div className="dialog-top">
           <Logo />
@@ -1135,7 +1122,7 @@ function App() {
         <button className="button primary" onClick={() => setModal(null)}>
           Entendido <Check size={16} />
         </button>
-      </dialog>
+      </BankModal>
       {toast && (
         <div className="toast" role="status">
           <Check size={18} />
