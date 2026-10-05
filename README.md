@@ -131,7 +131,7 @@ Gestión no incorpora autenticación ni control de acceso. No deben almacenarse 
 
 ## Autoría y recursos
 
-Proyecto original de **Lisset Yataco Tasayco / [Analiza Jech](https://github.com/AnalizaJech)**.
+Proyecto desarrollado por **[Analiza Jech](https://github.com/AnalizaJech)** como trabajo freelance para **Lisset Yataco Tasayco**, clienta del proyecto.
 
 - **Marca:** símbolo, logotipo y favicon propios en SVG.
 - **Fotografía:** [recurso original de Unsplash](https://images.unsplash.com/photo-1511895426328-dc8714191300), almacenado localmente.
